@@ -1,0 +1,21 @@
+{
+    "name": "tokenAuth",
+    "version": "1.0.0",
+    "keywords": [
+        "util",
+        "functional",
+        "server",
+        "client",
+        "browser"
+    ],
+    "author": "Leonardo",
+    "contributors": [],
+    "dependencies": {
+        "express": "",
+        "socket.io": "",
+        "mysql": "",
+        "socketio-jwt": "",
+        "body-parser": "",
+        "jsonwebtoken": ""
+    }
+}
