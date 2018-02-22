@@ -20,10 +20,21 @@ app.get('/', (req, res) => {
     res.send('hello');
 });
 
-io.use(exMiddl);//example middleware
+//io.use(exMiddl);//example middleware
 
-io.on('connection', (socket) => {
+//MIDDLEWARE EXAMPLE
+io.use((socket, next) => {
+
+    console.log('connected cl');
+    next(handleSocket(socket));//let to go on. Without next, the code breaks in these brackets. next() or next(fn) lets to see io in the next lines outside the {}s
+
+});
+
+
+function handleSocket(socket) {
+    console.log('middleware recall');
     console.log('new client connected');
+    //console.log(socket.handshake.query);
 
     socket.on('disconnect', () => {
         console.log('Client disconnected');
@@ -35,20 +46,56 @@ io.on('connection', (socket) => {
             if (auth) {
                 console.log(u.name + ' succefully authenticated');
                 socket.emit('server_auth', 'you are authenticated.'); //io.to(socket.id).emit() pheraps is powerful.
-                io.emit('server_msg', 'new client connected');
+                io.emit('server_msg', 'new client connected');//broadcast
                 token = createToken(u);
                 console.log(token);
                 socket_array.push(socket);
+                startService(u,socket);
+                
                 //var decoded_token = jwt.verify(token,'secret');
                 //console.log('From token:'+decoded_token.name);
+            } else {
+                console.log('User not found.');
             }
         }).catch((error) => {
             console.log('Failed to authenticate ' + u.name + '. ' + error);
         });
     });
+}
 
 
-});
+///
+
+//io.on('connection', (socket) => {
+//    console.log('new client connected');
+//    console.log(socket.handshake.query);
+//
+//    socket.on('disconnect', () => {
+//        console.log('Client disconnected');
+//    });
+//
+//    socket.on('auth', (u) => {
+//        console.log('try to authenticate ' + u.name);
+//        authenticate(u).then((auth) => {
+//            if (auth) {
+//                console.log(u.name + ' succefully authenticated');
+//                socket.emit('server_auth', 'you are authenticated.'); //io.to(socket.id).emit() pheraps is powerful.
+//                io.emit('server_msg', 'new client connected');
+//                token = createToken(u);
+//                console.log(token);
+//                socket_array.push(socket);
+//                //var decoded_token = jwt.verify(token,'secret');
+//                //console.log('From token:'+decoded_token.name);
+//            }else{
+//                console.log('User not found.');
+//            }
+//        }).catch((error) => {
+//            console.log('Failed to authenticate ' + u.name + '. ' + error);
+//        });
+//    });
+
+
+//});
 
 function createToken(u) {
     var token = jwt.sign(u, 'secret', {
